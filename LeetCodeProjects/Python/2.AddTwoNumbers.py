@@ -32,44 +32,22 @@ class Solution:
     def addTwoNumbers(self, l1, l2):
         remainder = 0
         k = 10
-        res_head = res_l = None
-        while l1 and l2:
-            res_val = (l1.val + l2.val + remainder) % k
-            node = ListNode(val=res_val)
-            if not res_l:
-                res_l = res_head = node
+        result_list, current = None, None
+
+        while l1 or l2 or remainder:
+            val = (l1.val if l1 else 0) + (l2.val if l2 else 0) + remainder
+            node = ListNode(val=val % k)
+            if not result_list:
+                current = result_list = node
             else:
-                res_l.next = node
-                res_l = res_l.next
-            remainder = (l1.val + l2.val + remainder) // k
-            l1, l2 = l1.next, l2.next
+                current.next = node
+                current = current.next
 
-        while l1:
-            res_val = (l1.val + remainder) % k
-            node = ListNode(val=res_val)
-            if not res_l:
-                res_l = res_head = node
-            else:
-                res_l.next = node
-                res_l = res_l.next
-            remainder = (l1.val + remainder) // k
-            l1 = l1.next
+            remainder = val // k
+            l1 = l1.next if l1 else None
+            l2 = l2.next if l2 else None
 
-        while l2:
-            res_val = (l2.val + remainder) % k
-            node = ListNode(val=res_val)
-            if not res_l:
-                res_l = res_head = node
-            else:
-                res_l.next = node
-                res_l = res_l.next
-            remainder = (l2.val + remainder) // k
-            l2 = l2.next
-
-        if remainder != 0:
-            res_l.next = ListNode(val=remainder, next=None)
-
-        return res_head
+        return result_list
 
 
 if __name__ == '__main__':

@@ -1,6 +1,4 @@
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 
 public class Solutions {
@@ -1467,9 +1465,210 @@ public class Solutions {
      * Return the simplified canonical path.
      */
     public String simplifyPath(String path) {
+        Stack<String> stack = new Stack<>();
+        for (String s : path.split("/+")) {
+            if (s.equals("..") && !stack.empty())
+                stack.pop();
+            else if (!s.isEmpty() && !s.equals(".") && !s.equals(".."))
+                stack.push(s);
+        }
+        StringBuilder str = new StringBuilder();
+        for (String s : stack)
+            str.append("/").append(s);
 
+        return stack.empty() ? "/" : str.toString();
+    }
+
+    /**
+     * 150. Evaluate Reverse Polish Notation
+     * You are given an array of strings tokens that represents an arithmetic expression in a Reverse Polish Notation.
+     * Evaluate the expression. Return an integer that represents the value of the expression.
+     * Note that:
+     * The valid operators are '+', '-', '*', and '/'.
+     * Each operand may be an integer or another expression.
+     * The division between two integers always truncates toward zero.
+     * There will not be any division by zero.
+     * The input represents a valid arithmetic expression in a reverse polish notation.
+     * The answer and all the intermediate calculations can be represented in a 32-bit integer.
+     */
+    public int evalRPN(String[] tokens) {
+        Set<String> operations = Set.of("+", "-", "*", "/");
+        Stack<Integer> stack = new Stack<>();
+
+        for (String token : tokens) {
+            if (operations.contains(token)) {
+                int rightSide = stack.pop();
+                int leftSide = stack.pop();
+
+                switch (token) {
+                    case "+":
+                        stack.push(leftSide + rightSide);
+                        break;
+                    case "-":
+                        stack.push(leftSide - rightSide);
+                        break;
+                    case "*":
+                        stack.push(leftSide * rightSide);
+                        break;
+                    case "/":
+                        stack.push(leftSide / rightSide);
+                }
+            } else
+                stack.push(Integer.valueOf(token));
+        }
+        return stack.pop();
+    }
+
+    /**
+     * 224. Basic Calculator
+     * Given a string s representing a valid expression, implement a basic calculator to evaluate it,
+     * and return the result of the evaluation.
+     * Note: You are not allowed to use any built-in function which evaluates strings as mathematical expressions, such as eval().
+     */
+    public int calculate(String s) {
+        s = s.replaceAll("\\s", "");
+        Stack<Integer> stack = new Stack<>();
+        int num = 0;
+        int sign = 1;
+        int result = 0;
+
+        for (char c : s.toCharArray()) {
+            if (Character.isDigit(c)) {
+                num = num * 10 + (c - '0');
+            } else if (c == '+') {
+                result += sign * num;
+                sign = 1;
+                num = 0;
+            } else if (c == '-') {
+                result += sign * num;
+                sign = -1;
+                num = 0;
+            } else if (c == '(') {
+                stack.push(result);
+                stack.push(sign);
+                sign = 1;
+                result = 0;
+            } else if (c == ')') {
+                result += sign * num;
+                num = 0;
+
+                result *= stack.pop();  // Previous result before '('
+                result += stack.pop();  // Sum before the '('
+
+                sign = 1;  // Reset sign after parenthesis
+            }
+        }
+
+        result += sign * num;
+
+        return result;
+    }
+//    public int calculate(String s) {
+//        s = s.replaceAll("\\s", "");
+//        Stack<String> stack = new Stack<>();
+//        for (char c : s.toCharArray()) {
+//            if (c == ')') {
+//                String token = stack.pop();
+//                List<String> list = new ArrayList<>();
+//                while (!token.equals("(")) {
+//                    list.add(token);
+//                    token = stack.pop();
+//                }
+//                stack.push(calcParse(list));
+//            } else
+//                stack.push(String.valueOf(c));
+//        }
+//
+//        List<String> list = new ArrayList<>();
+//        while (!stack.empty()) {
+//            String str = stack.pop();
+//            if (!str.equals("(") && !str.equals(")"))
+//                list.add(String.valueOf(str));
+//        }
+//        return Integer.parseInt(calcParse(list));
+//    }
+//
+//    private String calcParse(List<String> list) {
+//        int result = 0;
+//        for (int i = 0; i < list.size(); i++) {
+//            StringBuilder str = new StringBuilder();
+//            while (i < list.size() && (Character.isDigit(list.get(i).charAt(0)) || list.get(i).length() > 1))
+//                str.insert(0, list.get(i++));
+//
+//            int num = Integer.parseInt(String.valueOf(str));
+//            if (i >= list.size()) {
+//                result += num;
+//                break;
+//            }
+//
+//            String op = list.get(i);
+//            switch (op) {
+//                case "+":
+//                    result += num;
+//                    break;
+//                case "-":
+//                    result -= num;
+//            }
+//        }
+//        return String.valueOf(result);
+//    }
+}
+
+/**
+ * 155. Min Stack
+ * Companies
+ * Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+ * Implement the MinStack class:
+ * MinStack() initializes the stack object.
+ * void push(int val) pushes the element val onto the stack.
+ * void pop() removes the element on the top of the stack.
+ * int top() gets the top element of the stack.
+ * int getMin() retrieves the minimum element in the stack.
+ * You must implement a solution with O(1) time complexity for each function.
+ */
+class MinStack {
+    private Node head;
+
+    public void push(int val) {
+        if (head == null) {
+            head = new Node(val, val, null);
+        } else {
+            head = new Node(val, Math.min(val, head.min), head);
+        }
+    }
+
+    public void pop() {
+        head = head.next;
+    }
+
+    public int top() {
+        return head.val;
+    }
+
+    public int getMin() {
+        return head.min;
     }
 }
+
+class Node {
+    int val, min;
+    Node next;
+
+    Node(int val, int min, Node next) {
+        this.val = val;
+        this.min = min;
+        this.next = next;
+    }
+}
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack obj = new MinStack();
+ * obj.push(val);
+ * obj.pop();
+ * int param_3 = obj.top();
+ * int param_4 = obj.getMin();
+ */
 
 /**
  * 380. Insert Delete GetRandom O(1)

@@ -100,6 +100,12 @@ public class main {
 
 //        System.out.println(solutions.longestConsecutive(new int[]{100,4,200,1,3,2}));
 
-    solutions.insert(new int[][]{{1,5}}, new int[]{0,0});
+//    solutions.insert(new int[][]{{1,5}}, new int[]{0,0});
+
+//        solutions.simplifyPath("/../");
+
+//        solutions.evalRPN(new String[]{"10", "6", "9", "3", "+", "-11", "*", "/", "*", "17", "+", "5", "+"});
+
+        solutions.calculate("1-(     -2)");
     }
 }

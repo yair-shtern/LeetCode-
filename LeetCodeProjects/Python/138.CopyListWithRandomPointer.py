@@ -56,30 +56,23 @@ class Node:
 
 class Solution:
     def copyRandomList(self, head):
-        nodes_dict = dict()
-        new_tmp = None
-        new_head = None
-        tmp = head
-        while tmp:
-            node = Node(tmp.val, tmp.next)
-            if not new_tmp:
-                new_tmp = new_head = node
+        old_to_new_nodes_dict = dict()
+        current = result_list = None
+        while head:
+            node = Node(head.val)
+            if not result_list:
+                current = result_list = node
             else:
-                new_tmp.next = node
-                new_tmp = new_tmp.next
+                current.next = node
+                current = current.next
+            old_to_new_nodes_dict[head] = node
+            head = head.next
 
-            nodes_dict[tmp] = node
-            tmp = tmp.next
+        for old, new in old_to_new_nodes_dict.items():
+            if old.random:
+                new.random = old_to_new_nodes_dict[old.random]
 
-        tmp = head
-        while tmp:
-            if not tmp.random:
-                nodes_dict[tmp].random = None
-            else:
-                nodes_dict[tmp].random = nodes_dict[tmp.random]
-            tmp = tmp.next
-
-        return new_head
+        return result_list
 
 
 if __name__ == '__main__':
